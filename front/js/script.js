@@ -1,6 +1,10 @@
 const apiUrl = 'http://localhost:3000/api/products'
 const productList = document.querySelector('#items')
 
+function formProductPageUrl (_id) {
+  return './product.html?_id=' + _id
+}
+
 /**
  * to create a product element in HTML
  */
@@ -9,10 +13,10 @@ function createProductElement (item) {
   const altTxt = item.altTxt
   const name = item.name
   const description = item.description
+  const _id = item._id
 
   let product = document.createElement('a')
-  // todo: add the URL for the specific product later
-  // product.setAttribute('href', '')
+  product.setAttribute('href', formProductPageUrl(_id))
 
   let productInfo = document.createElement('article')
 
