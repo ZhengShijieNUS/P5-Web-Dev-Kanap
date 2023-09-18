@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:3000/api/products'
+const listAllProductApiUrl = 'http://localhost:3000/api/products'
 const productList = document.querySelector('#items')
 
 function formProductPageUrl (_id) {
@@ -39,9 +39,9 @@ function createProductElement (item) {
   productList.appendChild(product)
 }
 
-function updateTheListOfProducts () {
+function updateTheListOfProductsIntoPage () {
   //fetch the product data from the API
-  fetch(apiUrl)
+  fetch(listAllProductApiUrl)
     .then(response => {
       if (!response.ok) {
         throw new Error(`Error,Status:${response.status}`)
@@ -59,4 +59,4 @@ function updateTheListOfProducts () {
     })
 }
 
-updateTheListOfProducts()
+updateTheListOfProductsIntoPage()
