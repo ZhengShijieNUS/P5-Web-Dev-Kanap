@@ -114,12 +114,10 @@ addToCartButton.addEventListener('click', () => {
       }
     }
 
-    //If the item's color is 1st time added, then add the new color to the array
+    //If the product is added before but just the color is 1st time added, then add the new color to the array
     if (!isFounded) {
       items.push({ [color]: quantity })
     }
-
-    console.log(items)
 
     localStorage.setItem(_id, JSON.stringify(items))
   } else {
