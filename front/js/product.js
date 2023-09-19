@@ -1,8 +1,9 @@
 const getProductByIdApiUrl = 'http://localhost:3000/api/products'
+const addToCartButton = document.querySelector('#addToCart')
 
 /**
  * The function to get the id from URL search parameters
- * 
+ *
  * @returns _id of the product
  */
 function getProductId () {
@@ -14,8 +15,8 @@ function getProductId () {
 
 /**
  * Create the page html tag of a product to display details
- * 
- * @param {The product detail data obtain from API} item 
+ *
+ * @param {The product detail data obtain from API} item
  */
 function createProductDetail (item) {
   const imageUrl = item.imageUrl
@@ -54,8 +55,23 @@ function createProductDetail (item) {
   }
 }
 
-function updateTheProductDetailIntoPage () {
-  fetch(getProductByIdApiUrl + '/' + getProductId())
+function getUsersSelectedColor () {
+  const productColorList = document.getElementById('colors')
+  const selectedOption =
+    productColorList.options[productColorList.selectedIndex]
+
+  const colorSelected = selectedOption.value
+
+  return colorSelected
+}
+
+function getUsersSelectedQuantity () {
+  const quantityElement = document.querySelector('#quantity')
+  return quantityElement.value
+}
+
+async function updateTheProductDetailIntoPage () {
+  await fetch(getProductByIdApiUrl + '/' + getProductId())
     .then(response => {
       if (!response.ok) {
         throw new Error(`Error,Status:${response.status}`)
@@ -65,6 +81,7 @@ function updateTheProductDetailIntoPage () {
     })
     .then(data => {
       createProductDetail(data)
+      // addToCartEvent(data)
     })
     .catch(err => {
       console.error('Fetch error: ' + err.message)
@@ -72,3 +89,42 @@ function updateTheProductDetailIntoPage () {
 }
 
 updateTheProductDetailIntoPage()
+
+// data structure in localStorage
+// eg: _id:[{ black: 0 }, { orange: 2 }]
+
+addToCartButton.addEventListener('click', () => {
+  const _id = getProductId()
+  const color = getUsersSelectedColor()
+  const quantity = parseInt(getUsersSelectedQuantity()) // convert quantity from string to number
+
+  if (localStorage.getItem(_id) !== null) {
+    const items = JSON.parse(localStorage.getItem(_id))
+
+    let isFounded = false
+
+    for (let i = 0; i < items.length; i++) {
+      let item = items[i]
+
+      //If the item's color exists in the item, then update the quantity directly
+      if (color in item) {
+        isFounded = true
+        item[color] = item[color] + quantity
+        break
+      }
+    }
+
+    //If the item's color is 1st time added, then add the new color to the array
+    if (!isFounded) {
+      items.push({ [color]: quantity })
+    }
+
+    console.log(items)
+
+    localStorage.setItem(_id, JSON.stringify(items))
+  } else {
+    //If the product is 1st time added, create the record in the localStorage
+    const newItems = [{ [color]: quantity }]
+    localStorage.setItem(_id, JSON.stringify(newItems))
+  }
+})
