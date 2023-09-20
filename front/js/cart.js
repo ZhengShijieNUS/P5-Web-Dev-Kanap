@@ -305,6 +305,8 @@ function loadLocalStorageContentToCartPage(fetchPromises){
  * Main function of cart.js, the entrance of all the functions
  */
 function showTheCartDetail () {
+  updateCartPrice()
+  
   if (localStorage.length !== 0) {
     const fetchPromises = [] // Store fetch promises in an array
 
