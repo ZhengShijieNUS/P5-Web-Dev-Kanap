@@ -8,7 +8,7 @@
  *  */
 
 const productCatalogueApi = 'http://localhost:3000/api/products'
-const cart_items_section = document.querySelector('#cart__items');
+const cart_items_section = document.querySelector('#cart__items')
 
 function createCartArticleViewDOM (itemDetailRes, itemInCart, productId) {
   for (let i = 0; i < itemInCart.length; i++) {
@@ -19,25 +19,24 @@ function createCartArticleViewDOM (itemDetailRes, itemInCart, productId) {
 
     let color = ''
     let quantity = ''
-    // To get the color and quantity from itemInCart dynamically 
+    // To get the color and quantity from itemInCart dynamically
     for (const key in itemInCart[i]) {
       if (itemInCart[i].hasOwnProperty(key)) {
         color = key
         quantity = itemInCart[i][key]
-        console.log(`color: ${color}, quantity: ${quantity}`)
       }
     }
 
     const article = document.createElement('article')
-    article.setAttribute('data-id',productId)
-    article.setAttribute('data-color',color)
+    article.setAttribute('data-id', productId)
+    article.setAttribute('data-color', color)
     article.classList.add('cart__item')
 
     const cart__item__img_div = document.createElement('div')
     cart__item__img_div.classList.add('cart__item__img')
     const img = document.createElement('img')
-    img.setAttribute('src',imgSrc)
-    img.setAttribute('alt',imgAlt)
+    img.setAttribute('src', imgSrc)
+    img.setAttribute('alt', imgAlt)
     cart__item__img_div.appendChild(img)
     article.appendChild(cart__item__img_div)
 
@@ -45,7 +44,9 @@ function createCartArticleViewDOM (itemDetailRes, itemInCart, productId) {
     cart__item__content_div.classList.add('cart__item__content')
 
     const cart__item__content__description_div = document.createElement('div')
-    cart__item__content__description_div.classList.add('cart__item__content__description')
+    cart__item__content__description_div.classList.add(
+      'cart__item__content__description'
+    )
     const name_h2 = document.createElement('h2')
     const color_p = document.createElement('p')
     const price_p = document.createElement('p')
@@ -57,33 +58,44 @@ function createCartArticleViewDOM (itemDetailRes, itemInCart, productId) {
     cart__item__content__description_div.appendChild(price_p)
     cart__item__content_div.appendChild(cart__item__content__description_div)
 
-
     const cart__item__content__settings_div = document.createElement('div')
-    cart__item__content__settings_div.classList.add('cart__item__content__settings')
-    
-    const cart__item__content__settings__quantity_div = document.createElement('div')
-    cart__item__content__settings__quantity_div.classList.add('cart__item__content__settings__quantity')
+    cart__item__content__settings_div.classList.add(
+      'cart__item__content__settings'
+    )
+
+    const cart__item__content__settings__quantity_div =
+      document.createElement('div')
+    cart__item__content__settings__quantity_div.classList.add(
+      'cart__item__content__settings__quantity'
+    )
     const quantity_p = document.createElement('p')
     quantity_p.textContent = 'Quantity : '
     const itemQuantityInput = document.createElement('input')
-    itemQuantityInput.setAttribute('type','number')
+    itemQuantityInput.setAttribute('type', 'number')
     itemQuantityInput.classList.add('itemQuantity')
-    itemQuantityInput.setAttribute('name','itemQuantity')
-    itemQuantityInput.setAttribute('min','1')
-    itemQuantityInput.setAttribute('max','100')
-    itemQuantityInput.setAttribute('value',parseInt(quantity))
+    itemQuantityInput.setAttribute('name', 'itemQuantity')
+    itemQuantityInput.setAttribute('min', '1')
+    itemQuantityInput.setAttribute('max', '100')
+    itemQuantityInput.setAttribute('value', parseInt(quantity))
     cart__item__content__settings__quantity_div.appendChild(quantity_p)
     cart__item__content__settings__quantity_div.appendChild(itemQuantityInput)
-    cart__item__content__settings_div.appendChild(cart__item__content__settings__quantity_div)
+    cart__item__content__settings_div.appendChild(
+      cart__item__content__settings__quantity_div
+    )
 
-    const cart__item__content__settings__delete_div = document.createElement('div')
-    cart__item__content__settings__delete_div.classList.add('cart__item__content__settings__delete')
+    const cart__item__content__settings__delete_div =
+      document.createElement('div')
+    cart__item__content__settings__delete_div.classList.add(
+      'cart__item__content__settings__delete'
+    )
     const deleteItem_p = document.createElement('p')
     deleteItem_p.classList.add('deleteItem')
     deleteItem_p.textContent = 'Delete'
     cart__item__content__settings__delete_div.appendChild(deleteItem_p)
-    cart__item__content__settings_div.appendChild(cart__item__content__settings__delete_div)
-    
+    cart__item__content__settings_div.appendChild(
+      cart__item__content__settings__delete_div
+    )
+
     cart__item__content_div.appendChild(cart__item__content__settings_div)
 
     article.appendChild(cart__item__content_div)
@@ -92,12 +104,53 @@ function createCartArticleViewDOM (itemDetailRes, itemInCart, productId) {
   }
 }
 
+function calculateTotalQuantityOfArticles () {
+  const articlesList = cart_items_section.getElementsByTagName('article')
+  return articlesList.length
+}
+
+function calculateTotalPrice () {
+  const totalPriceElement = document.getElementById('totalPrice')
+  const articlesList = cart_items_section.getElementsByTagName('article')
+
+  let sum = 0
+
+  for (let i = 0; i < articlesList.length; i++){
+    const article = articlesList[i]
+    
+    const unitPrice = article.querySelectorAll('.cart__item__content__description p')[1].textContent
+    const quantity = article.querySelector('input').value
+
+    const currentProductCost = parseInt(unitPrice) * parseInt(quantity)
+
+    sum += currentProductCost
+  }
+
+  console.log(sum)
+  
+  return sum
+
+}
+
+function updateCartPrice () {
+  const totalQuantityOfArticles = calculateTotalQuantityOfArticles()
+  const totalCost = calculateTotalPrice()
+
+  const totalQuantity = document.querySelector('#totalQuantity')
+  const totalPrice = document.querySelector('#totalPrice')
+
+  totalQuantity.textContent = totalQuantityOfArticles
+  totalPrice.textContent = totalCost
+}
+
 function showTheCartDetail () {
   if (localStorage.length !== 0) {
+    const fetchPromises = [] // Store fetch promises in an array
+
     for (let i = 0; i < localStorage.length; i++) {
       const _id = localStorage.key(i)
       const itemInCart = JSON.parse(localStorage.getItem(_id))
-      fetch(productCatalogueApi + '/' + _id)
+      const fetchPromise = fetch(productCatalogueApi + '/' + _id)
         .then(response => {
           if (!response.ok) {
             throw new Error(`Error,Status:${response.status}`)
@@ -111,9 +164,15 @@ function showTheCartDetail () {
         .catch(err => {
           console.error('Fetch error: ' + err.message)
         })
+
+      fetchPromises.push(fetchPromise)
     }
+
+    // Use Promise.all to wait for all fetch promises to resolve
+    Promise.all(fetchPromises).then(() => {
+      updateCartPrice() // Call updateCartPrice() after all fetch requests are completed
+    })
   }
 }
-
 
 showTheCartDetail()
