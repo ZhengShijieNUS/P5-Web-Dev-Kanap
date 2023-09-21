@@ -221,7 +221,9 @@ function deleteFromLocalStorageForSpecificArticle(_id, color){
  * Function to update the GUI if there is quantity changes on the page
  * @param {*} inputElements 
  */
-function addEventListenerForQuantityChanges (inputElements) {
+function addEventListenerForQuantityChanges () {
+  const inputElements = cart_items_section.querySelectorAll('input')
+
   for (const element of inputElements) {
     element.addEventListener('change', () => {
       const article = element.closest('article')
@@ -249,7 +251,9 @@ function addEventListenerForQuantityChanges (inputElements) {
  * Function to update the GUI if there is article removed from the page
  * @param {*} deleteItemElements 
  */
-function addEventListenerForDeleteArticle(deleteItemElements){
+function addEventListenerForDeleteArticle(){
+  const deleteItemElements = cart_items_section.querySelectorAll('.deleteItem')
+
   for (const element of deleteItemElements){
     element.addEventListener('click',() => {
       const article = element.closest('article')
@@ -274,7 +278,7 @@ function addEventListenerForDeleteArticle(deleteItemElements){
 }
 
 /**
- * The function to rendering the cart based on the data stored in the local storage
+ * Helper function: The function to rendering the cart based on the data stored in the local storage
  * @param {*} fetchPromises an array of promises, storing the promised api results for later usage
  */
 function loadLocalStorageContentToCartPage(fetchPromises){
@@ -302,10 +306,108 @@ function loadLocalStorageContentToCartPage(fetchPromises){
 }
 
 /**
+ * Helper function to set text content to be empty string and display the error message
+ * @param {} element 
+ */
+function setUpContentWhenError(element){
+  const errorMessageID = '#'+ element.name + 'ErrorMsg'
+  const errorElement = document.querySelector(errorMessageID)
+  errorElement.textContent = 'Invalid ' + element.name
+  element.value = ''
+}
+
+
+/**
+ * Helper function to validate the value of element through regex pattern
+ * @param {} element 
+ */
+function validateContactDetail(element){
+  let regex = ''
+  switch(element.id){
+    case 'firstName':
+      regex = new RegExp('^[a-zA-Z]+$')
+      if(!regex.test(element.value)){
+        // add error message and set the input to be empty string
+        setUpContentWhenError(element)
+      }
+      break
+    case 'lastName':
+      regex = new RegExp('^[a-zA-Z]+$')
+      if(!regex.test(element.value)){
+        setUpContentWhenError(element)
+      }
+      break
+    case 'address':
+      regex = new RegExp("^[a-zA-Z0-9\\s.,#'-]+$") // double quote need to use \\ instead of \
+      if(!regex.test(element.value)){
+        setUpContentWhenError(element)
+      }
+      break
+    case 'city':
+      regex = new RegExp("^[a-zA-Z\\s'-]+$")
+      if(!regex.test(element.value)){
+        setUpContentWhenError(element)
+      }
+      break
+    case 'email':
+      regex = new RegExp("\\S+@\\S+\\.\\S+")
+      if(!regex.test(element.value)){
+        setUpContentWhenError(element)
+      }
+      break
+  }
+
+}
+
+/**
+ * Function to add event listners for the contact details of users input
+ */
+function addContactDetailsValidation(){
+  const firstName = document.querySelector('#firstName')
+  const lastName = document.querySelector('#lastName')
+  const address = document.querySelector('#address')
+  const city = document.querySelector('#city')
+  const email = document.querySelector('#email')
+
+  firstName.addEventListener('change',() => {
+    validateContactDetail(firstName)
+  })
+
+  lastName.addEventListener('change',() => {
+    validateContactDetail(lastName)
+  });
+
+  address.addEventListener('change',() => {
+    validateContactDetail(address)
+  });
+
+  city.addEventListener('change',() => {
+    validateContactDetail(city)
+  });
+
+  email.addEventListener('change',() => {
+    validateContactDetail(email)
+  });
+
+}
+
+
+/**
+ * Function to add event listeners for submit order 
+ */
+function addEventListenerForOrderSubmission(){
+  
+
+}
+
+/**
  * Main function of cart.js, the entrance of all the functions
  */
 function showTheCartDetail () {
   updateCartPrice()
+
+  // Add contact details validation
+  addContactDetailsValidation()
 
   if (localStorage.length !== 0) {
     const fetchPromises = [] // Store fetch promises in an array
@@ -316,15 +418,14 @@ function showTheCartDetail () {
     Promise.all(fetchPromises).then(() => {
       updateCartPrice() // Call updateCartPrice() after all fetch requests are completed
 
-      const inputElements = cart_items_section.querySelectorAll('input')
-      const deleteItemElements = cart_items_section.querySelectorAll('.deleteItem')
-
       // Add event listener for inputElements for quantity changes
-      addEventListenerForQuantityChanges(inputElements)
+      addEventListenerForQuantityChanges()
 
       // Add event litener for deleteItemElements for item deleted
-      addEventListenerForDeleteArticle(deleteItemElements)
+      addEventListenerForDeleteArticle()
 
+      // Add event listener for order submission
+      addEventListenerForOrderSubmission()
     })
   }
 }
