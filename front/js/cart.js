@@ -221,7 +221,7 @@ function deleteFromLocalStorageForSpecificArticle(_id, color){
  * Function to update the GUI if there is quantity changes on the page
  * @param {*} inputElements 
  */
-function updatePageContentForQuantityChanges (inputElements) {
+function addEventListenerForQuantityChanges (inputElements) {
   for (const element of inputElements) {
     element.addEventListener('change', () => {
       const article = element.closest('article')
@@ -249,7 +249,7 @@ function updatePageContentForQuantityChanges (inputElements) {
  * Function to update the GUI if there is article removed from the page
  * @param {*} deleteItemElements 
  */
-function updatePageContentForDeleteArticle(deleteItemElements){
+function addEventListenerForDeleteArticle(deleteItemElements){
   for (const element of deleteItemElements){
     element.addEventListener('click',() => {
       const article = element.closest('article')
@@ -306,7 +306,7 @@ function loadLocalStorageContentToCartPage(fetchPromises){
  */
 function showTheCartDetail () {
   updateCartPrice()
-  
+
   if (localStorage.length !== 0) {
     const fetchPromises = [] // Store fetch promises in an array
 
@@ -319,11 +319,11 @@ function showTheCartDetail () {
       const inputElements = cart_items_section.querySelectorAll('input')
       const deleteItemElements = cart_items_section.querySelectorAll('.deleteItem')
 
-      // Update the content if there is any quantity changes
-      updatePageContentForQuantityChanges(inputElements)
+      // Add event listener for inputElements for quantity changes
+      addEventListenerForQuantityChanges(inputElements)
 
-      // Update the content if there is any item deleted
-      updatePageContentForDeleteArticle(deleteItemElements)
+      // Add event litener for deleteItemElements for item deleted
+      addEventListenerForDeleteArticle(deleteItemElements)
 
     })
   }
