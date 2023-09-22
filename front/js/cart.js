@@ -439,11 +439,10 @@ function makePostOrderRequest (payload) {
       return response.json()
     })
     .then(data => {
-      console.log(data.orderId)
       const confirmationPageUrl = './confirmation.html?orderId=' + data.orderId
 
       localStorage.clear()
-      
+
       window.location.href = confirmationPageUrl
     })
     .catch(error => {
