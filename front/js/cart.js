@@ -315,9 +315,9 @@ function setUpContentWhenError (element) {
 
 /**
  * Helper function to set up error message empty when the user's input content is valid
- * @param {*} element 
+ * @param {*} element
  */
-function setUpErrorMessageEmpty(element){
+function setUpErrorMessageEmpty (element) {
   const errorMessageID = '#' + element.name + 'ErrorMsg'
   const errorElement = document.querySelector(errorMessageID)
   errorElement.textContent = ''
@@ -335,7 +335,7 @@ function validateContactDetail (element) {
       if (!regex.test(element.value)) {
         // add error message and set the input to be empty string
         setUpContentWhenError(element)
-      }else {
+      } else {
         setUpErrorMessageEmpty(element)
       }
       break
@@ -343,8 +343,7 @@ function validateContactDetail (element) {
       regex = new RegExp('^[a-zA-Z]+$')
       if (!regex.test(element.value)) {
         setUpContentWhenError(element)
-      }
-      else {
+      } else {
         setUpErrorMessageEmpty(element)
       }
       break
@@ -352,7 +351,7 @@ function validateContactDetail (element) {
       regex = new RegExp("^[a-zA-Z0-9\\s.,#'-]+$") // double quote need to use \\ instead of \
       if (!regex.test(element.value)) {
         setUpContentWhenError(element)
-      }else {
+      } else {
         setUpErrorMessageEmpty(element)
       }
       break
@@ -360,7 +359,7 @@ function validateContactDetail (element) {
       regex = new RegExp("^[a-zA-Z\\s'-]+$")
       if (!regex.test(element.value)) {
         setUpContentWhenError(element)
-      }else {
+      } else {
         setUpErrorMessageEmpty(element)
       }
       break
@@ -368,7 +367,7 @@ function validateContactDetail (element) {
       regex = new RegExp('\\S+@\\S+\\.\\S+')
       if (!regex.test(element.value)) {
         setUpContentWhenError(element)
-      }else {
+      } else {
         setUpErrorMessageEmpty(element)
       }
       break
@@ -410,22 +409,21 @@ function addContactDetailsValidation () {
  * Helper function to get the current product list in the cart
  * @returns an array of product list currently exist in the cart
  */
-function getCurrentCartProductList(){
+function getCurrentCartProductList () {
   const productList = []
 
-  for(let i = 0; i < localStorage.length; i++) {
+  for (let i = 0; i < localStorage.length; i++) {
     productList.push(localStorage.key(i))
   }
 
   return productList
 }
 
-
 /**
  * To make a post request to the api with the specified payload
- * @param {*} payload 
+ * @param {*} payload
  */
-function makePostOrderRequest(payload){
+function makePostOrderRequest (payload) {
   const postApi = productCatalogueApi + '/order'
   const options = {
     method: 'POST',
@@ -433,19 +431,44 @@ function makePostOrderRequest(payload){
     body: JSON.stringify(payload)
   }
 
-  fetch(postApi, options).then(response =>{
-    if(!response.ok){
-      throw Error(response.status)
-    }
-    return response.json()
-  }).then(data => {
-    console.log(data)
+  fetch(postApi, options)
+    .then(response => {
+      if (!response.ok) {
+        throw Error(response.status)
+      }
+      return response.json()
+    })
+    .then(data => {
+      console.log(data.orderId)
+      const confirmationPageUrl = './confirmation.html?orderId=' + data.orderId
 
-    
-  }).catch(error => {
-    console.error("Fetch error: " + error.message)
-  })
+      localStorage.clear()
+      
+      window.location.href = confirmationPageUrl
+    })
+    .catch(error => {
+      console.error('Fetch error: ' + error.message)
+    })
+}
 
+/**
+ * Helper function, to check the validity of the payload which is going to be sent
+ * @param {} payload
+ */
+function isValidatePostPayload (payload) {
+
+  if (
+    payload.contact.firstName !== '' &&
+    payload.contact.lastName !== '' &&
+    payload.contact.address !== '' &&
+    payload.contact.city !== '' &&
+    payload.contact.email !== '' &&
+    payload.products.length !== 0
+  ) {
+    return true
+  } else {
+    return false
+  }
 }
 
 /**
@@ -454,9 +477,9 @@ function makePostOrderRequest(payload){
 function addEventListenerForOrderSubmission () {
   const orderButton = document.querySelector('#order')
 
-  orderButton.addEventListener('click', (event) => {
+  orderButton.addEventListener('click', event => {
     event.preventDefault()
-    
+
     const payload = {
       contact: {
         firstName: document.querySelector('#firstName').value,
@@ -468,7 +491,16 @@ function addEventListenerForOrderSubmission () {
       products: getCurrentCartProductList()
     }
 
-    makePostOrderRequest(payload)
+    try {
+      if (isValidatePostPayload(payload)) {
+        makePostOrderRequest(payload)
+      } else {
+        throw new Error('Invalid post payload, please check any empty fields inside.')
+      }
+    } catch (error) {
+      alert(error.message)
+      console.error(error)
+    }
   })
 }
 
@@ -480,6 +512,9 @@ function showTheCartDetail () {
 
   // Add contact details validation
   addContactDetailsValidation()
+
+  // Add event listener for order submission
+  addEventListenerForOrderSubmission()
 
   if (localStorage.length !== 0) {
     const fetchPromises = [] // Store fetch promises in an array
@@ -495,9 +530,6 @@ function showTheCartDetail () {
 
       // Add event litener for deleteItemElements for item deleted
       addEventListenerForDeleteArticle()
-
-      // Add event listener for order submission
-      addEventListenerForOrderSubmission()
     })
   }
 }
