@@ -12,7 +12,7 @@ const cart_items_section = document.querySelector('#cart__items')
 
 /**
  * Helper function, function to create the view on the page for each article
- * 
+ *
  * @param {*} itemDetailRes response from the API
  * @param {*} itemInCart the array containing the color and its quantity
  * @param {*} productId the product specific id
@@ -113,7 +113,7 @@ function createCartArticleViewDOM (itemDetailRes, itemInCart, productId) {
 
 /**
  * Helper function, to calculate the number of articles currently on the page
- * 
+ *
  * @returns the number of the articles currently on the page
  */
 function calculateTotalQuantityOfArticles () {
@@ -123,7 +123,7 @@ function calculateTotalQuantityOfArticles () {
 
 /**
  * Helper function, to calculate the total cost currently on the page
- * 
+ *
  * @returns the total cost
  */
 function calculateTotalPrice () {
@@ -164,7 +164,7 @@ function updateCartPrice () {
 
 /**
  * Helper function, invoked when the quantity stored in the local storage changes
- * 
+ *
  * @param {*} _id the product id
  * @param {*} color the color selected
  * @param {*} quantity the quantity to update
@@ -189,16 +189,16 @@ function updateLocalStorageToSpecificQuantity (_id, color, quantity) {
 
 /**
  * Helper function, invoked when a specific color of a product stored in the local storage is removed
- * 
- * @param {*} _id 
- * @param {*} color 
+ *
+ * @param {*} _id
+ * @param {*} color
  */
-function deleteFromLocalStorageForSpecificArticle(_id, color){
-  if(localStorage.getItem(_id) !== null){
+function deleteFromLocalStorageForSpecificArticle (_id, color) {
+  if (localStorage.getItem(_id) !== null) {
     const items = JSON.parse(localStorage.getItem(_id))
 
     //Iterate the array, find out the specific color one and delete it from the array
-    for(let i = 0; i < items.length; i++){
+    for (let i = 0; i < items.length; i++) {
       const item = items[i]
 
       if (color in item) {
@@ -211,7 +211,7 @@ function deleteFromLocalStorageForSpecificArticle(_id, color){
     localStorage.setItem(_id, JSON.stringify(items))
 
     //if array is empty, remove the _id from the local storage
-    if(items.length === 0){
+    if (items.length === 0) {
       localStorage.removeItem(_id)
     }
   }
@@ -219,7 +219,7 @@ function deleteFromLocalStorageForSpecificArticle(_id, color){
 
 /**
  * Function to update the GUI if there is quantity changes on the page
- * @param {*} inputElements 
+ * @param {*} inputElements
  */
 function addEventListenerForQuantityChanges () {
   const inputElements = cart_items_section.querySelectorAll('input')
@@ -242,20 +242,19 @@ function addEventListenerForQuantityChanges () {
         .catch(err => {
           console.error('Fetch error: ' + err.message)
         })
-
     })
   }
 }
 
 /**
  * Function to update the GUI if there is article removed from the page
- * @param {*} deleteItemElements 
+ * @param {*} deleteItemElements
  */
-function addEventListenerForDeleteArticle(){
+function addEventListenerForDeleteArticle () {
   const deleteItemElements = cart_items_section.querySelectorAll('.deleteItem')
 
-  for (const element of deleteItemElements){
-    element.addEventListener('click',() => {
+  for (const element of deleteItemElements) {
+    element.addEventListener('click', () => {
       const article = element.closest('article')
       const _id = article.dataset.id
       const color = article.dataset.color
@@ -272,7 +271,6 @@ function addEventListenerForDeleteArticle(){
         .catch(err => {
           console.error('Fetch error: ' + err.message)
         })
-
     })
   }
 }
@@ -281,7 +279,7 @@ function addEventListenerForDeleteArticle(){
  * Helper function: The function to rendering the cart based on the data stored in the local storage
  * @param {*} fetchPromises an array of promises, storing the promised api results for later usage
  */
-function loadLocalStorageContentToCartPage(fetchPromises){
+function loadLocalStorageContentToCartPage (fetchPromises) {
   for (let i = 0; i < localStorage.length; i++) {
     const _id = localStorage.key(i)
     const itemInCart = JSON.parse(localStorage.getItem(_id))
@@ -302,102 +300,176 @@ function loadLocalStorageContentToCartPage(fetchPromises){
 
     fetchPromises.push(fetchPromise)
   }
-
 }
 
 /**
  * Helper function to set text content to be empty string and display the error message
- * @param {} element 
+ * @param {} element
  */
-function setUpContentWhenError(element){
-  const errorMessageID = '#'+ element.name + 'ErrorMsg'
+function setUpContentWhenError (element) {
+  const errorMessageID = '#' + element.name + 'ErrorMsg'
   const errorElement = document.querySelector(errorMessageID)
   errorElement.textContent = 'Invalid ' + element.name
   element.value = ''
 }
 
+/**
+ * Helper function to set up error message empty when the user's input content is valid
+ * @param {*} element 
+ */
+function setUpErrorMessageEmpty(element){
+  const errorMessageID = '#' + element.name + 'ErrorMsg'
+  const errorElement = document.querySelector(errorMessageID)
+  errorElement.textContent = ''
+}
 
 /**
  * Helper function to validate the value of element through regex pattern
- * @param {} element 
+ * @param {} element
  */
-function validateContactDetail(element){
+function validateContactDetail (element) {
   let regex = ''
-  switch(element.id){
+  switch (element.id) {
     case 'firstName':
       regex = new RegExp('^[a-zA-Z]+$')
-      if(!regex.test(element.value)){
+      if (!regex.test(element.value)) {
         // add error message and set the input to be empty string
         setUpContentWhenError(element)
+      }else {
+        setUpErrorMessageEmpty(element)
       }
       break
     case 'lastName':
       regex = new RegExp('^[a-zA-Z]+$')
-      if(!regex.test(element.value)){
+      if (!regex.test(element.value)) {
         setUpContentWhenError(element)
+      }
+      else {
+        setUpErrorMessageEmpty(element)
       }
       break
     case 'address':
       regex = new RegExp("^[a-zA-Z0-9\\s.,#'-]+$") // double quote need to use \\ instead of \
-      if(!regex.test(element.value)){
+      if (!regex.test(element.value)) {
         setUpContentWhenError(element)
+      }else {
+        setUpErrorMessageEmpty(element)
       }
       break
     case 'city':
       regex = new RegExp("^[a-zA-Z\\s'-]+$")
-      if(!regex.test(element.value)){
+      if (!regex.test(element.value)) {
         setUpContentWhenError(element)
+      }else {
+        setUpErrorMessageEmpty(element)
       }
       break
     case 'email':
-      regex = new RegExp("\\S+@\\S+\\.\\S+")
-      if(!regex.test(element.value)){
+      regex = new RegExp('\\S+@\\S+\\.\\S+')
+      if (!regex.test(element.value)) {
         setUpContentWhenError(element)
+      }else {
+        setUpErrorMessageEmpty(element)
       }
       break
   }
-
 }
 
 /**
  * Function to add event listners for the contact details of users input
  */
-function addContactDetailsValidation(){
+function addContactDetailsValidation () {
   const firstName = document.querySelector('#firstName')
   const lastName = document.querySelector('#lastName')
   const address = document.querySelector('#address')
   const city = document.querySelector('#city')
   const email = document.querySelector('#email')
 
-  firstName.addEventListener('change',() => {
+  firstName.addEventListener('change', () => {
     validateContactDetail(firstName)
   })
 
-  lastName.addEventListener('change',() => {
+  lastName.addEventListener('change', () => {
     validateContactDetail(lastName)
-  });
+  })
 
-  address.addEventListener('change',() => {
+  address.addEventListener('change', () => {
     validateContactDetail(address)
-  });
+  })
 
-  city.addEventListener('change',() => {
+  city.addEventListener('change', () => {
     validateContactDetail(city)
-  });
+  })
 
-  email.addEventListener('change',() => {
+  email.addEventListener('change', () => {
     validateContactDetail(email)
-  });
+  })
+}
 
+/**
+ * Helper function to get the current product list in the cart
+ * @returns an array of product list currently exist in the cart
+ */
+function getCurrentCartProductList(){
+  const productList = []
+
+  for(let i = 0; i < localStorage.length; i++) {
+    productList.push(localStorage.key(i))
+  }
+
+  return productList
 }
 
 
 /**
- * Function to add event listeners for submit order 
+ * To make a post request to the api with the specified payload
+ * @param {*} payload 
  */
-function addEventListenerForOrderSubmission(){
-  
+function makePostOrderRequest(payload){
+  const postApi = productCatalogueApi + '/order'
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }
 
+  fetch(postApi, options).then(response =>{
+    if(!response.ok){
+      throw Error(response.status)
+    }
+    return response.json()
+  }).then(data => {
+    console.log(data)
+
+    
+  }).catch(error => {
+    console.error("Fetch error: " + error.message)
+  })
+
+}
+
+/**
+ * Function to add event listeners for submit order
+ */
+function addEventListenerForOrderSubmission () {
+  const orderButton = document.querySelector('#order')
+
+  orderButton.addEventListener('click', (event) => {
+    event.preventDefault()
+    
+    const payload = {
+      contact: {
+        firstName: document.querySelector('#firstName').value,
+        lastName: document.querySelector('#lastName').value,
+        address: document.querySelector('#address').value,
+        city: document.querySelector('#city').value,
+        email: document.querySelector('#email').value
+      },
+      products: getCurrentCartProductList()
+    }
+
+    makePostOrderRequest(payload)
+  })
 }
 
 /**
