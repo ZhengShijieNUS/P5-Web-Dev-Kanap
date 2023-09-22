@@ -6,7 +6,8 @@ function formProductPageUrl (_id) {
 }
 
 /**
- * to create a product element in HTML
+ * Helper function, to create a product element in HTML
+ * @param {HTML_Element} item 
  */
 function createProductElement (item) {
   const imageUrl = item.imageUrl

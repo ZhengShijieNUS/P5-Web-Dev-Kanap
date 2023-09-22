@@ -55,6 +55,10 @@ function createProductDetail (item) {
   }
 }
 
+/**
+ * To get the color that user selected
+ * @returns the color selected by the user
+ */
 function getUsersSelectedColor () {
   const productColorList = document.getElementById('colors')
   const selectedOption =
@@ -65,11 +69,18 @@ function getUsersSelectedColor () {
   return colorSelected
 }
 
+/**
+ * To get the quantity that user selected
+ * @returns the quantity selected by the user
+ */
 function getUsersSelectedQuantity () {
   const quantityElement = document.querySelector('#quantity')
   return quantityElement.value
 }
 
+/**
+ * To get rendering the product details to the page
+ */
 async function updateTheProductDetailIntoPage () {
   await fetch(getProductByIdApiUrl + '/' + getProductId())
     .then(response => {
@@ -81,7 +92,6 @@ async function updateTheProductDetailIntoPage () {
     })
     .then(data => {
       createProductDetail(data)
-      // addToCartEvent(data)
     })
     .catch(err => {
       console.error('Fetch error: ' + err.message)
@@ -93,10 +103,13 @@ updateTheProductDetailIntoPage()
 // data structure in localStorage
 // eg: _id:[{ black: 0 }, { orange: 2 }]
 
-addToCartButton.addEventListener('click', () => {
-  const _id = getProductId()
-  const color = getUsersSelectedColor()
-  const quantity = parseInt(getUsersSelectedQuantity()) // convert quantity from string to number
+/**
+ * Helper function, to update the localStorage with user input data
+ * @param {string} _id 
+ * @param {string} color 
+ * @param {number} quantity 
+ */
+function updateLocalStorageWithUserInput(_id,color,quantity){
 
   if (localStorage.getItem(_id) !== null) {
     const items = JSON.parse(localStorage.getItem(_id))
@@ -125,4 +138,13 @@ addToCartButton.addEventListener('click', () => {
     const newItems = [{ [color]: quantity }]
     localStorage.setItem(_id, JSON.stringify(newItems))
   }
+
+}
+
+addToCartButton.addEventListener('click', () => {
+  const _id = getProductId()
+  const color = getUsersSelectedColor()
+  const quantity = parseInt(getUsersSelectedQuantity()) // convert quantity from string to number
+
+  updateLocalStorageWithUserInput(_id,color,quantity)
 })
