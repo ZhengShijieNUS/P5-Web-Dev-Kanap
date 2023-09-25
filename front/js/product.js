@@ -141,10 +141,22 @@ function updateLocalStorageWithUserInput(_id,color,quantity){
 
 }
 
+function isValidQuantity(quantity){
+  if(quantity > 0){
+    return true
+  }
+
+  return false
+}
+
 addToCartButton.addEventListener('click', () => {
   const _id = getProductId()
   const color = getUsersSelectedColor()
   const quantity = parseInt(getUsersSelectedQuantity()) // convert quantity from string to number
 
-  updateLocalStorageWithUserInput(_id,color,quantity)
+  if(isValidQuantity(quantity)){
+    updateLocalStorageWithUserInput(_id,color,quantity)
+  }else{
+    alert("Please enter a valid quantity")
+  }
 })

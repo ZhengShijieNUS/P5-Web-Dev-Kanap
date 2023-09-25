@@ -217,6 +217,14 @@ function deleteFromLocalStorageForSpecificArticle (_id, color) {
   }
 }
 
+function isValidQuantity (quantity) {
+  if (quantity > 0) {
+    return true
+  }
+
+  return false
+}
+
 /**
  * Function to update the GUI if there is quantity changes on the page
  * @param {*} inputElements
@@ -231,17 +239,22 @@ function addEventListenerForQuantityChanges () {
       const color = article.dataset.color
       const quantity = parseInt(element.value)
 
-      //update localstorage
-      updateLocalStorageToSpecificQuantity(_id, color, parseInt(quantity))
+      if (isValidQuantity(quantity)) {
+        //update localstorage
+        updateLocalStorageToSpecificQuantity(_id, color, parseInt(quantity))
 
-      //update the the total price through ajax request to partially update the page instead of reloading the full page
-      fetch(productCatalogueApi)
-        .then(() => {
-          updateCartPrice()
-        })
-        .catch(err => {
-          console.error('Fetch error: ' + err.message)
-        })
+        //update the the total price through ajax request to partially update the page instead of reloading the full page
+        fetch(productCatalogueApi)
+          .then(() => {
+            updateCartPrice()
+          })
+          .catch(err => {
+            console.error('Fetch error: ' + err.message)
+          })
+      } else {
+        alert('Please enter a valid quantity')
+        element.value = 1
+      }
     })
   }
 }
@@ -267,6 +280,10 @@ function addEventListenerForDeleteArticle () {
         .then(() => {
           cart_items_section.removeChild(article)
           updateCartPrice()
+
+          if (localStorage.length === 0) {
+            showEmptyCartMessage()
+          }
         })
         .catch(err => {
           console.error('Fetch error: ' + err.message)
@@ -455,7 +472,6 @@ function makePostOrderRequest (payload) {
  * @param {} payload
  */
 function isValidatePostPayload (payload) {
-
   if (
     payload.contact.firstName !== '' &&
     payload.contact.lastName !== '' &&
@@ -494,13 +510,29 @@ function addEventListenerForOrderSubmission () {
       if (isValidatePostPayload(payload)) {
         makePostOrderRequest(payload)
       } else {
-        throw new Error('Invalid post payload, please check any empty fields inside.')
+        throw new Error(
+          'Invalid post payload, please check any empty fields inside.'
+        )
       }
     } catch (error) {
       alert(error.message)
       console.error(error)
     }
   })
+}
+
+function showEmptyCartMessage () {
+  const emptyMessage = document.createElement('h2')
+  emptyMessage.setAttribute('style', 'text-align: center')
+  const clickMe = document.createElement('a')
+  clickMe.textContent = 'click me'
+  clickMe.setAttribute('href', '../html/index.html')
+
+  emptyMessage.append('The cart is empty，please ')
+  emptyMessage.appendChild(clickMe)
+  emptyMessage.append(' to add products.')
+
+  cart_items_section.appendChild(emptyMessage)
 }
 
 /**
@@ -529,7 +561,10 @@ function showTheCartDetail () {
 
       // Add event litener for deleteItemElements for item deleted
       addEventListenerForDeleteArticle()
+
     })
+  } else {
+    showEmptyCartMessage()
   }
 }
 
