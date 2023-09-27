@@ -40,9 +40,9 @@ function createProductElement (item) {
   productList.appendChild(product)
 }
 
-async function updateTheListOfProductsIntoPage () {
+function updateTheListOfProductsIntoPage () {
   //fetch the product data from the API
-  await fetch(listAllProductApiUrl)
+  fetch(listAllProductApiUrl)
     .then(response => {
       if (!response.ok) {
         throw new Error(`Error,Status:${response.status}`)

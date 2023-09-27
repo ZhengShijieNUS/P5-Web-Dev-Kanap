@@ -243,18 +243,13 @@ function addEventListenerForQuantityChanges () {
         //update localstorage
         updateLocalStorageToSpecificQuantity(_id, color, parseInt(quantity))
 
-        //update the the total price through ajax request to partially update the page instead of reloading the full page
-        fetch(productCatalogueApi)
-          .then(() => {
-            updateCartPrice()
-          })
-          .catch(err => {
-            console.error('Fetch error: ' + err.message)
-          })
       } else {
         alert('Please enter a valid quantity')
         element.value = 1
       }
+
+      //update the the total price
+      updateCartPrice()
     })
   }
 }
@@ -275,19 +270,15 @@ function addEventListenerForDeleteArticle () {
       //delete the item from localstorage
       deleteFromLocalStorageForSpecificArticle(_id, color)
 
-      //update the the total price and GUI through ajax request to partially update the page instead of reloading the full page
-      fetch(productCatalogueApi)
-        .then(() => {
-          cart_items_section.removeChild(article)
-          updateCartPrice()
+      //delete the element from the page
+      cart_items_section.removeChild(article)
+      
+      // update the the total price and GUI 
+      updateCartPrice()
 
-          if (localStorage.length === 0) {
-            showEmptyCartMessage()
-          }
-        })
-        .catch(err => {
-          console.error('Fetch error: ' + err.message)
-        })
+      if (localStorage.length === 0) {
+        showEmptyCartMessage()
+      }
     })
   }
 }
@@ -561,7 +552,6 @@ function showTheCartDetail () {
 
       // Add event litener for deleteItemElements for item deleted
       addEventListenerForDeleteArticle()
-
     })
   } else {
     showEmptyCartMessage()

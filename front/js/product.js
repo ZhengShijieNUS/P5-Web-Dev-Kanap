@@ -81,8 +81,8 @@ function getUsersSelectedQuantity () {
 /**
  * To get rendering the product details to the page
  */
-async function updateTheProductDetailIntoPage () {
-  await fetch(getProductByIdApiUrl + '/' + getProductId())
+function updateTheProductDetailIntoPage () {
+  fetch(getProductByIdApiUrl + '/' + getProductId())
     .then(response => {
       if (!response.ok) {
         throw new Error(`Error,Status:${response.status}`)
